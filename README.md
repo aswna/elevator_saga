@@ -1,2 +1,4 @@
 # elevator_saga
-My solutions of Elevator Saga (The elevator programming game) levels
+My own solutions of the [Elevator Saga (The elevator programming game)][1] levels.
+
+[1]: https://play.elevatorsaga.com/
