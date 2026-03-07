@@ -15,7 +15,7 @@ Solutions for the [Elevator Saga (The elevator programming game)](https://play.e
     - [Solution](https://github.com/aswna/elevator_saga/tree/master/challenge_02/prog.js): go to the floors, which were pressed in the elevator, and go to the bottom floor when idle (I know this is dumb, but works for this challenge and sometimes for [Challenge #3](https://play.elevatorsaga.com/#challenge=3))
 
   * [Challenge #3](https://play.elevatorsaga.com/#challenge=3): Transport 23 people in 60 seconds or less
-    - This is still a basic challenge with 1 (larger) elevator and 5 floors
+    - This is still a basic challenge with 1 larger elevator and 5 floors
     - [Solution](https://github.com/aswna/elevator_saga/tree/master/challenge_03/prog.js): same as previously
 
   * [Challenge #4](https://play.elevatorsaga.com/#challenge=4): Transport 28 people in 60 seconds or less
@@ -36,7 +36,7 @@ Solutions for the [Elevator Saga (The elevator programming game)](https://play.e
 
   * [Challenge #5](https://play.elevatorsaga.com/#challenge=5): Transport 100 people in 68 seconds or less
     - This challenge has 4 elevators and 6 floors
-    - Previous solution stops 4th elevator between 4th and 5th floors :)
+    - [Previous solution](https://github.com/aswna/elevator_saga/tree/master/challenge_04/prog.js) stops 4th elevator between 4th and 5th floors :)
     - [Trial #1](https://github.com/aswna/elevator_saga/tree/master/challenge_05/trial1.js): best were 99 people
       - fix for integer division
     - [Trial #2](https://github.com/aswna/elevator_saga/tree/master/challenge_05/trial2.js): mostly works for this challenge (~50%)
@@ -57,6 +57,37 @@ Solutions for the [Elevator Saga (The elevator programming game)](https://play.e
       - The performance of [Trial #2](https://github.com/aswna/elevator_saga/tree/master/challenge_05/trial2.js) seems to be superior to this solution
 
   * [Challenge #6](https://play.elevatorsaga.com/#challenge=6): Transport 40 people using 60 elevator moves or less
+    - This challenge has 2 elevators and 4 floors
+    - [Solution](https://github.com/aswna/elevator_saga/tree/master/challenge_06/prog.js): sometimes works for this challenge (~20%)
+    - This solution sometimes works for Challenges #7-#12, but performs really poorly at Challenge #10 and #12
+
+  * [Challenge #7](https://play.elevatorsaga.com/#challenge=7): Transport 100 people using 63 elevator moves or less
+    - This challenge has 3 elevators and 3 floors
+    - We can see that some of the elevators stay idle too long
+    - We need to improve, see TODO
+
+  * [Challenge #8](https://play.elevatorsaga.com/#challenge=8): Transport 50 people and let no one wait more than 21.0 seconds
+    - This challenge has 2 larger elevators and 6 floors
+    - [Previous solution](https://github.com/aswna/elevator_saga/tree/master/challenge_06/prog.js): sometimes works for this challenge (~50%), but we can see that one of the elevators stays idle too long
+
+  * [Challenge #9](https://play.elevatorsaga.com/#challenge=9): Transport 50 people and let no one wait more than 20.0 seconds
+    - This challenge has 3 elevators and 7 floors
+
+  * [Challenge #10](https://play.elevatorsaga.com/#challenge=10): Transport 50 people in 70 seconds or less
+    - This challenge has 1 big and 1 regular elevators and 13 floors
+
+  * [Challenge #11](https://play.elevatorsaga.com/#challenge=11): Transport 60 people and let no one wait more than 19.0 seconds
+    - This challenge has 5 elevators and 9 floors
+
+  * [Challenge #12](https://play.elevatorsaga.com/#challenge=12): Transport 80 people and let no one wait more than 17.0 seconds
+    - This challenge has 5 elevators and 9 floors
+
+  * [Challenge #13](https://play.elevatorsaga.com/#challenge=13): Transport 100 people and let no one wait more than 15.0 seconds
+    - This challenge has 5 larger elevators and 9 floors
+
+## TODO
+- we should use a global dispatcher, which dispatches external requests to the "best" candidate
+- define "best" candidate
 
 ## Known issues
 - the elevator stops at phantom destinations (at floors where it should not stop anymore, e.g. the other elevator took care of it already)
