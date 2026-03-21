@@ -10,9 +10,9 @@
             console.log("Finding the best elevator for UpOrDown:", upOrDown,
                         "Request on floor:", floorNum);
             let bestElevatorNum   = -1;
-            let bestElevatorScore = -Infinity;
+            let bestElevatorScore = -1;
             for (let elevatorNum = 0; elevatorNum < numberOfElevators; ++elevatorNum) {
-                const elevator = elevators[elevatorNum];
+                let elevator = elevators[elevatorNum];
                 const elevatorScore = getElevatorScore(elevator, floorNum, upOrDown);
                 console.log("Elevator:", elevatorNum,
                             "Score:", elevatorScore);
@@ -24,7 +24,6 @@
 
             console.log("Found the best elevator:", bestElevatorNum,
                         "Score:", bestElevatorScore,
-                        "Load:", elevators[bestElevatorNum].loadFactor(),
                         "For UpOrDown:", upOrDown,
                         "Request on floor:", floorNum);
             return elevators[bestElevatorNum];
@@ -82,30 +81,21 @@
             }
             alreadyHasBonus += elevator.buttonsPressed.has(floorNum) ? 0.5 : 0.0;
 
-            if (isElevatorFull(elevator)) {
-                return -10.0;
-            }
-
-            return alreadyHasBonus
-                   - elevator.loadFactor() * elevator.maxPassengerCount() / 10.0               // elevator load by capacity
+            return 5.0
+                   + alreadyHasBonus
+                   - elevator.loadFactor() * elevator.maxPassengerCount() / 10.0    // elevator load by capacity
                    - distanceWeight * Math.abs(elevator.currentFloor() - floorNum) / numberOfFloors  // distance
-                   - elevator.destinationQueue.length / (2.0 * numberOfFloors);                      // queue length
+                   - elevator.destinationQueue.length / (2.0 * numberOfFloors);     // queue length
         }
 
         function insertFloor(elevator, floorNum, upOrDown) {
-            if (upOrDown == null) {
+            if (upOrDown === "undefined") {
                 elevator.buttonsPressed.add(floorNum);
             } else if (upOrDown === "up") {
                 elevator.requestsUp.add(floorNum);
             } else {
                 elevator.requestsDown.add(floorNum);
             }
-
-            if (isElevatorFull(elevator)) {
-                return;
-            }
-
-            updateDestinationQueue(elevator);
 
             console.log("Elevator:", elevator.num,
                         "Destination queue:", [...elevator.destinationQueue],
@@ -125,9 +115,9 @@
             const lastDirection = elevator.lastDirection;
             if (direction === "up" || (direction === "stopped" && lastDirection === "up")) {
                 const floorsFirstUp   = new Set([...elevator.buttonsPressed, ...elevator.requestsUp]);
-                const floorsUpGreater = [...floorsFirstUp].filter(v => v >= currentFloor).sort((a, b) => a - b);
+                const floorsUpGreater = [...floorsFirstUp].filter(v => v > currentFloor).sort((a, b) => a - b);
 
-                const buttonsPressedLower = [...elevator.buttonsPressed].filter(v => v < currentFloor);
+                const buttonsPressedLower = [...elevator.buttonsPressed].filter(v => v <= currentFloor);
                 const floorsAllDown       = new Set([...buttonsPressedLower, ...elevator.requestsDown]);
                 const floorsDown          = [...floorsAllDown].sort((a, b) => b - a);
 
@@ -136,9 +126,9 @@
                 elevator.destinationQueue = [...floorsUpGreater, ...floorsDown, ...floorsUpLower];
             } else {
                 const floorsFirstDown = new Set([...elevator.buttonsPressed, ...elevator.requestsDown]);
-                const floorsDownLower = [...floorsFirstDown].filter(v => v <= currentFloor).sort((a, b) => b - a);
+                const floorsDownLower = [...floorsFirstDown].filter(v => v < currentFloor).sort((a, b) => b - a);
 
-                const buttonsPressedGreater = [...elevator.buttonsPressed].filter(v => v > currentFloor);
+                const buttonsPressedGreater = [...elevator.buttonsPressed].filter(v => v >= currentFloor);
                 const floorsAllUp           = new Set([...buttonsPressedGreater, ...elevator.requestsUp]);
                 const floorsUp              = [...floorsAllUp].sort((a, b) => a - b);
 
@@ -151,10 +141,6 @@
             elevator.checkDestinationQueue();
             console.log("Elevator:", elevator.num,
                         "Updated destination queue:", [...elevator.destinationQueue]);
-        }
-
-        function isElevatorFull(elevator) {
-            return elevator.loadFactor() > 0.75;
         }
 
         function updateUpDownIndicator(elevator) {
@@ -187,6 +173,7 @@
                 const upOrDown = "up";
                 let elevator = getBestElevatorForRequest(floorNum, upOrDown);
                 insertFloor(elevator, floorNum, upOrDown);
+                updateDestinationQueue(elevator);
             });
             floors[floorNum].on("down_button_pressed", function() {
                 console.log("Floor:", floorNum,
@@ -195,6 +182,7 @@
                 const upOrDown = "down";
                 let elevator = getBestElevatorForRequest(floorNum, upOrDown);
                 insertFloor(elevator, floorNum, upOrDown);
+                updateDestinationQueue(elevator);
             });
         }
 
@@ -227,7 +215,6 @@
                             "Requests DOWN:", [...elevator.requestsDown]);
 
                 turnOnUpDownIndicators(elevator);
-                updateDestinationQueue(elevator);
             });
 
             // BUTTON PRESSED (inside the elevator)
@@ -239,7 +226,8 @@
                             "Requests UP:", [...elevator.requestsUp],
                             "Requests DOWN:", [...elevator.requestsDown]);
 
-                insertFloor(elevator, floorNum, null);
+                insertFloor(elevator, floorNum, "undefined");
+                updateDestinationQueue(elevator);
             });
 
             // STOPPED
@@ -247,7 +235,7 @@
                 const direction = elevator.destinationDirection();
                 console.log("Elevator:", elevator.num,
                             "STOPPED at floor:", floorNum,
-                            "Load:", elevator.loadFactor(),
+                            "Load factor:", elevator.loadFactor(),
                             "Direction:", direction,
                             "Last direction:", elevator.lastDirection,
                             "Destination queue:", [...elevator.destinationQueue],

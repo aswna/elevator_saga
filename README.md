@@ -22,28 +22,28 @@ Solutions for the [Elevator Saga (The elevator programming game)](https://play.e
     - This challenge has 2 elevators and 8 floors
     - [Trial #1](https://github.com/aswna/elevator_saga/tree/master/challenge_04/trial1.js): adopting the previous algorithm for multiple elevators (works for about half of the runs)
     - [Trial #2](https://github.com/aswna/elevator_saga/tree/master/challenge_04/trial2.js): sometimes works for this challenge
-      - starting to handle up/down button presses on the floors and distribute them between the elevators,
-      - partition the building to vertical sections: we send idle elevators to the bottom floor of their sections
-      - consolidate destination queue (remove duplicate floors)
+      - Starting to handle up/down button presses on the floors and distribute them between the elevators
+      - Partition the building to vertical sections: we send idle elevators to the bottom floor of their sections
+      - Consolidate destination queue (remove duplicate floors)
     - [Trial #3](https://github.com/aswna/elevator_saga/tree/master/challenge_04/trial3.js)
-      - adding debug logs (can be checked in the Console of Developer mode, e.g., CTRL+Shift+I),
+      - Adding debug logs (can be checked in the Console of Developer mode, e.g., CTRL+Shift+I)
     - [Solution](https://github.com/aswna/elevator_saga/tree/master/challenge_04/prog.js): mostly works for this challenge
-      - when we stop at a floor remove the floor from the destination queue of the elevator
+      - When we stop at a floor remove the floor from the destination queue of the elevator
       - Issues:
-        - the elevator stops at phantom destinations (at floors where we should not stop anymore, e.g. the other elevator took care of it)
-        - too many up-and-down moves (we should do a full scan to up/down)
-        - the elevator stops at floors to take passengers, but the elevator is already full
+        - The elevator stops at phantom destinations (at floors where we should not stop anymore, e.g. the other elevator took care of it)
+        - Too many up-and-down moves (we should do a full scan to up/down)
+        - The elevator stops at floors to take passengers, but the elevator is already full
 
   * [Challenge #5](https://play.elevatorsaga.com/#challenge=5): Transport 100 people in 68 seconds or less
     - This challenge has 4 elevators and 6 floors
     - [Previous solution](https://github.com/aswna/elevator_saga/tree/master/challenge_04/prog.js) stops 4th elevator between 4th and 5th floors :)
     - [Trial #1](https://github.com/aswna/elevator_saga/tree/master/challenge_05/trial1.js): best were 99 people
-      - fix for integer division
+      - Fix for integer division
     - [Trial #2](https://github.com/aswna/elevator_saga/tree/master/challenge_05/trial2.js): mostly works for this challenge (~50%)
-      - add more debug log
-      - fix: consolidate destination queue more (on up/down button pressed)
-      - add basic handling for the going up/down indicator
-      - apply the vertical partitioning instead of stripes for the up/down button presses
+      - Add more debug log
+      - Fix: consolidate destination queue more (on up/down button pressed)
+      - Add basic handling for the going up/down indicator
+      - Apply the vertical partitioning instead of stripes for the up/down button presses
     - [Solution](https://github.com/aswna/elevator_saga/tree/master/challenge_05/prog.js): sometimes works for this challenge (~30%)
       - I have experimented with different approaches, solutions, retried previous challenges (not saved as trials, there were too many)
       - Highlights
@@ -51,24 +51,39 @@ Solutions for the [Elevator Saga (The elevator programming game)](https://play.e
         - If an elevator is almost full, it ignores external requests
         - In case of idle, stopped at floor, or passing floor the elevator takes all external requests to the given direction (up or below of its current position)
       - I hope these are fixed (at least improved)
-        - too many up-and-down moves (we should do a full scan to the same direction - up/down)
-        - we probably do not handle the going up/down indicator correctly, so elevators can trick waiting passengers to get in the wrong direction
+        - Too many up-and-down moves (we should do a full scan to the same direction - up/down)
+        - We probably do not handle the going up/down indicator correctly, so elevators can trick waiting passengers to get in the wrong direction
       - This solution sometimes fails at [Challenge #3](https://play.elevatorsaga.com/#challenge=3) and [Challenge #4](https://play.elevatorsaga.com/#challenge=4)
       - The performance of [Trial #2](https://github.com/aswna/elevator_saga/tree/master/challenge_05/trial2.js) seems to be superior to this solution
 
   * [Challenge #6](https://play.elevatorsaga.com/#challenge=6): Transport 40 people using 60 elevator moves or less
     - This challenge has 2 elevators and 4 floors
-    - [Solution](https://github.com/aswna/elevator_saga/tree/master/challenge_06/prog.js): sometimes works for this challenge (~20%)
-    - This solution sometimes works for Challenges #7-#12, but performs really poorly at Challenge #10 and #12
+    - [Trial #1](https://github.com/aswna/elevator_saga/tree/master/challenge_06/trial1.js): sometimes works for this challenge (~20%)
+      - This trial sometimes works for Challenges #7-#12, but performs really poorly at Challenge #10 and #12, and cannot seem to work for Challenge #13
+      - We often can see that one of the elevators stays idle for too long
+    - [Trial #2](https://github.com/aswna/elevator_saga/tree/master/challenge_06/trial2.js): mostly refactor
+      - Elevators already have `destinationDirection()`, use that instead of own `direction`
+      - Fix for empty external requests in `handleExternalRequests()`
+    - [Trial #3](https://github.com/aswna/elevator_saga/tree/master/challenge_06/trial3.js): performs worse on this floor, but I believe we are on the right track
+      - Get rid of own queues for external up/down requests
+      - Introduce `getElevatorScore()` and `findBestElevatorForRequest()` to find best elevator for up/down button pressed on floor
+    - [Trial #4](https://github.com/aswna/elevator_saga/tree/master/challenge_06/trial4.js): new approach
+      - Already realized that the idea/implementation of `consolidateDestinationQueue()` was inherently wrong, since we mixed up floors where we needed to stop upwards and downwards, so I removed it
+      - Trying to insert the actual (pressed) floors to their correct position in the `destinationQueue` of the given elevator is also wrong, since we loose the information when should we stop there (upwards or downwards), so
+      - Introduced 3 sets per elevator (for buttons pressed in the elevator, for the floors where the elevator needs to stop upwards and downwards)
+      - Then we actualize the destination queue of an elevator based on these sets and the actual position and direction of the elevator
+      - We also need to remove the visited floors from the appropriate sets (considering the elevator was moving up or down)
+    - [Solution](https://github.com/aswna/elevator_saga/tree/master/challenge_06/prog.js): works well for this challenge (~90%)
+      - some refactor
+      - some fixes, e.g.:
+          - when the elevator was full it still tried to accept passengers,
+          - when the elevator was in idle it did not start to serve its requests
 
   * [Challenge #7](https://play.elevatorsaga.com/#challenge=7): Transport 100 people using 63 elevator moves or less
     - This challenge has 3 elevators and 3 floors
-    - We can see that some of the elevators stay idle too long
-    - We need to improve, see TODO
 
   * [Challenge #8](https://play.elevatorsaga.com/#challenge=8): Transport 50 people and let no one wait more than 21.0 seconds
     - This challenge has 2 larger elevators and 6 floors
-    - [Previous solution](https://github.com/aswna/elevator_saga/tree/master/challenge_06/prog.js): sometimes works for this challenge (~50%), but we can see that one of the elevators stays idle too long
 
   * [Challenge #9](https://play.elevatorsaga.com/#challenge=9): Transport 50 people and let no one wait more than 20.0 seconds
     - This challenge has 3 elevators and 7 floors
@@ -85,10 +100,6 @@ Solutions for the [Elevator Saga (The elevator programming game)](https://play.e
   * [Challenge #13](https://play.elevatorsaga.com/#challenge=13): Transport 100 people and let no one wait more than 15.0 seconds
     - This challenge has 5 larger elevators and 9 floors
 
-## TODO
-- we should use a global dispatcher, which dispatches external requests to the "best" candidate
-- define "best" candidate
-
 ## Known issues
-- the elevator stops at phantom destinations (at floors where it should not stop anymore, e.g. the other elevator took care of it already)
-- the elevator stops at floors to take passengers, but the elevator is already full
+- The elevator stops at phantom destinations (at floors where it should not stop anymore, e.g. the other elevator took care of it already)
+- The elevator stops at floors to take passengers, but the elevator is already full
